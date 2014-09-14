@@ -1,4 +1,4 @@
-
+{
   "name": "string-mutator",
   "main": "string-mutator.js",
   "version": "0.0.1",
@@ -22,7 +22,7 @@
     "bower_components",
     "app/bower_components",
     "test",
-    "tests"
+    "tests",
     "example"
   ]
 }
