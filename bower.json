@@ -1,0 +1,28 @@
+
+  "name": "string-mutator",
+  "main": "string-mutator.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/kristianmandrup/string-mutator",
+  "authors": [
+    "Kristian Mandrup <kmandrup@gmail.com>"
+  ],
+  "description": "Prepend/append content before/after first or last match. Useful for code insertion, such as in generators",
+  "keywords": [
+    "string-mutator",
+    "string",
+    "mutate",
+    "regexp",
+    "prepend",
+    "append" 
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+    "example"
+  ]
+}
