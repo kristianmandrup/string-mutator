@@ -1,6 +1,6 @@
 {
   "name": "string-mutator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/string-mutator.js",
   "description": "Prepend/append content before/after first or last match. Useful for simple automatic code refactorings such as in code generators",
   "homepage": "https://github.com/kristianmandrup/string-mutator",  
