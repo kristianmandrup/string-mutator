@@ -11,6 +11,9 @@ describe('string-mutator', function() {
         var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.first(/\d+/g).prepend('$', msg);
 
+        console.log('first prepend', res, ' -> Peter has $8 dollars and Jane has 15');
+        // Peter has $8 dollars and Jane has 15
+
         assert( res, "Peter has $8 dollars and Jane has 15");
       });    
     });
@@ -20,6 +23,8 @@ describe('string-mutator', function() {
         var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.first(/\d+/g).prepend('$').to(msg);
 
+        console.log('first prepend to', res, ' -> Peter has $8 dollars and Jane has 15');
+        // Peter has $8 dollars and Jane has 15
         assert( res, "Peter has $8 dollars and Jane has 15");
       });    
     });
@@ -28,6 +33,9 @@ describe('string-mutator', function() {
       it('appends $ after 8', function() {
         var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.first(/\d+/g).append('$', msg);
+
+        console.log('first append', res, ' -> Peter has 8$ dollars and Jane has 15');
+        // Peter has 8$ dollars and Jane has 15
         assert( res, "Peter has 8$ dollars and Jane has 15");
       });    
     });
@@ -39,6 +47,8 @@ describe('string-mutator', function() {
         var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.last(/\d+/g).prepend('$', msg);
 
+        console.log('last prepend', res, ' -> Peter has 8 dollars and Jane has 15$');
+        // Peter has 8 dollars and Jane has 15$
         assert( res, "Peter has 8 dollars and Jane has $15");
       });    
     });
@@ -47,6 +57,9 @@ describe('string-mutator', function() {
       it('appends $ after 15', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
         var res = sm.last(/\d+/g).append('$', msg);
+        
+        console.log('last append', res, ' -> Peter has 8 dollars and Jane has 15$');
+        // Peter has 8 dollars and Jane has 15$
         assert( res, "Peter has 8 dollars and Jane has 15$");
       });    
     });
@@ -56,7 +69,7 @@ describe('string-mutator', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
         var res = sm.last(/\d+/g).replaceWith('42', msg);
 
-        console.log('replace', res);
+        console.log('replace', res, '-> Peter has 8 dollars and Jane has 42');
         // Peter has 8 dollars and Jane has 42
         assert( res, "Peter has 8 dollars and Jane has 42");
       });    
