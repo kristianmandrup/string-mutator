@@ -23,13 +23,21 @@ $ npm run-script browser
 
 ## Documentation
 
+*Quick start*
+
 ```javascript
 var mutators = require('../lib/mutators');
 var sm = mutators.string; // string mutator
 var fm = mutators.file; // file mutator
 
 var msg = "Peter has 8 dollars and Jane has 15"
-sm.content(msg).last(/\d+/g).remove('Jane has 15');
+
+// String mutator
+sm.last(/\d+/g).remove('Jane has 15').on(msg);
+
+// using content
+sm.content(msg).last(/\d+/g).replace('15', '32');
+
 
 // File mutator - performing string mutations
 fm.readFile('test/files/test.txt').perform(function() {
@@ -41,6 +49,24 @@ res.write(res.original);
 ```
 
 ## String mutator API
+
+- first(matchExpr)
+- last(matchExpr)
+
+Any `first` or `last` return value can be chained with any of:
+
+- append
+- prepend
+- replace
+- remove
+
+Both `append` and `prepend` can be chained with `to` like this
+
+`sm.first(matchExpr).append('<FOUND>').to(target)`;`
+
+`replace` and `remove` chain with `to` instead
+
+`sm.first(matchExpr).remove().on(target)`;`
 
 ### first.prepend
 
@@ -100,12 +126,11 @@ var res = sm.last(/\d+/g).append('$', msg);
 
 ### replace
 
-Can also be used with `first` or `last`
-
 ```javascript
 var msg = "Peter has 8 dollars and Jane has 15$"
 var res = sm.last(/\d+/g).replace('15', '42', msg);
-// res = sm.last(/\d+/g).replace('15', '42').on(msg);
+
+res = sm.first(/\d+/g).replace('15', '42').on(msg);
 
 // => "Peter has 8 dollars and Jane has 42");
 ```

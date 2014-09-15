@@ -54,7 +54,7 @@ describe('string-mutator', function() {
     describe('replace', function() {
       it('replace 15 with 42', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
-        var res = sm.last(/\d+/g).replace('15', '42', msg);
+        var res = sm.last(/\d+/g).replaceWith('42', msg);
         assert( res, "Peter has 8 dollars and Jane has 42");
       });    
     });
@@ -62,7 +62,7 @@ describe('string-mutator', function() {
     describe('replace.on', function() {
       it('replace 15 with 42', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
-        var res = sm.last(/\d+/g).replace('15', '42').on(msg);
+        var res = sm.last(/\d+/g).replaceWith('42').on(msg);
         assert( res, "Peter has 8 dollars and Jane has 42");
       });    
     });
@@ -70,7 +70,7 @@ describe('string-mutator', function() {
     describe('remove', function() {
       it('remove 15', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
-        var res = sm.last(/\d+/g).remove('15', msg);
+        var res = sm.last(/\d+/g).remove(msg);
         assert( res, "Peter has 8 dollars and Jane has ");
       });    
     });
@@ -78,7 +78,7 @@ describe('string-mutator', function() {
     describe('remove.on', function() {
       it('remove 15', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
-        var res = sm.last(/\d+/g).remove('15').on(msg);
+        var res = sm.last(/\d+/g).remove().on(msg);
         assert( res, "Peter has 8 dollars and Jane has ");
       });    
     });
@@ -88,7 +88,7 @@ describe('string-mutator', function() {
     describe('last.prepend', function() {
       it('prepend $ before 15', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
-        var res = sm.content(msg).last(/\d+/g).remove('15');
+        var res = sm.content(msg).last(/\d+/g).remove();
         assert( res, "Peter has 8 dollars and Jane has ");
       });    
     });
@@ -96,7 +96,7 @@ describe('string-mutator', function() {
     describe('between', function() {
       it('replace last 15 before Paul with 20', function() {
         var msg = "Paul and Peter have 15 dollars, Jane has 15 and Paul has 15"
-        var res = sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replace('20');
+        var res = sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 
         // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
         assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
