@@ -1,12 +1,12 @@
 {
   "name": "string-mutator",
-  "main": "string-mutator.js",
-  "version": "0.0.3",
+  "main": "mutators.js",
+  "version": "0.1.0",
   "homepage": "https://github.com/kristianmandrup/string-mutator",
   "authors": [
     "Kristian Mandrup <kmandrup@gmail.com>"
   ],
-  "description": "Prepend/append content before/after first or last match. Useful for code insertion, such as in generators",
+  "description": "Perform mutation operations on text strings (or text files). Useful for (simple) automatic code refactorings f.ex in code generators",
   "keywords": [
     "string-mutator",
     "string",

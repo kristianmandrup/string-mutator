@@ -83,4 +83,25 @@ describe('string-mutator', function() {
       });    
     });
   });
+
+  describe('content', function() {  
+    describe('last.prepend', function() {
+      it('prepend $ before 15', function() {
+        var msg = "Peter has 8 dollars and Jane has 15$"
+        var res = sm.content(msg).last(/\d+/g).remove('15');
+        assert( res, "Peter has 8 dollars and Jane has ");
+      });    
+    });
+
+    describe('between', function() {
+      it('replace last 15 before Paul with 20', function() {
+        var msg = "Paul and Peter have 15 dollars, Jane has 15 and Paul has 15"
+        var res = sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replace('20');
+
+        // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
+        assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
+      });    
+    });
+
+  });
 });

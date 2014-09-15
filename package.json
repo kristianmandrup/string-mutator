@@ -1,8 +1,8 @@
 {
   "name": "string-mutator",
-  "version": "0.0.3",
-  "main": "lib/string-mutator.js",
-  "description": "Prepend/append content before/after first or last match. Useful for simple automatic code refactorings such as in code generators",
+  "version": "0.1.0",
+  "main": "lib/mutators.js",
+  "description": "Perform mutation operations on text strings (or text files). Useful for (simple) automatic code refactorings f.ex in code generators",
   "homepage": "https://github.com/kristianmandrup/string-mutator",  
   "bugs": "https://github.com/kristianmandrup/string-mutator/issues",
   "author": {
@@ -37,6 +37,6 @@
   },
   "scripts": {
     "test": "grunt",
-    "browser": "browserify lib/string-mutator.js > string-mutator.js" 
+    "browser": "browserify lib/mutators.js > mutators.js" 
   } 
 }
