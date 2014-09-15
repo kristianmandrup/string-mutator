@@ -55,6 +55,9 @@ describe('string-mutator', function() {
       it('replace 15 with 42', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
         var res = sm.last(/\d+/g).replaceWith('42', msg);
+
+        console.log('replace', res);
+        // Peter has 8 dollars and Jane has 42
         assert( res, "Peter has 8 dollars and Jane has 42");
       });    
     });
@@ -63,15 +66,21 @@ describe('string-mutator', function() {
       it('replace 15 with 42', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
         var res = sm.last(/\d+/g).replaceWith('42').on(msg);
+
+        console.log('replace.on', res);
+        // Peter has 8 dollars and Jane has 42
         assert( res, "Peter has 8 dollars and Jane has 42");
       });    
     });
 
     describe('remove', function() {
       it('remove 15', function() {
-        var msg = "Peter has 8 dollars and Jane has 15$"
+        var msg = "Peter has 8 dollars and Julie has 15$"
         var res = sm.last(/\d+/g).remove(msg);
-        assert( res, "Peter has 8 dollars and Jane has ");
+
+        console.log('remove', res);
+        // Peter has 8 dollars and Julie has $
+        assert( res, "Peter has 8 dollars and Julie has $");
       });    
     });
 
@@ -79,16 +88,23 @@ describe('string-mutator', function() {
       it('remove 15', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
         var res = sm.last(/\d+/g).remove().on(msg);
-        assert( res, "Peter has 8 dollars and Jane has ");
+
+        console.log('remove.on', res);
+        // Peter has 8 dollars and Jane has $
+
+        assert( res, "Peter has 8 dollars and Jane has $");
       });    
     });
   });
 
   describe('content', function() {  
-    describe('last.prepend', function() {
-      it('prepend $ before 15', function() {
+    describe('last remove', function() {
+      it('remove last number', function() {
         var msg = "Peter has 8 dollars and Jane has 15$"
         var res = sm.content(msg).last(/\d+/g).remove();
+
+        console.log('content.last remove', res);
+
         assert( res, "Peter has 8 dollars and Jane has ");
       });    
     });
@@ -98,6 +114,7 @@ describe('string-mutator', function() {
         var msg = "Paul and Peter have 15 dollars, Jane has 15 and Paul has 15"
         var res = sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 
+        console.log('between', res);
         // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
         assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
       });    
@@ -108,6 +125,7 @@ describe('string-mutator', function() {
         var msg = "Peter have 15 dollars, Jane has 15 and Paul has 15"
         var res = sm.content(msg).before(/Paul/).last(/\d+/g).replaceWith('20');
 
+        console.log('before', res);
         // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
         assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
       });    
@@ -118,6 +136,7 @@ describe('string-mutator', function() {
         var msg = "Peter have 15 dollars, Jane has 1 and Paul has 2"
         var res = sm.content(msg).after(/Jane/).first(/\d/g).replaceWith('3');
 
+        console.log('after', res);
         // => Peter has 15 dollars, Jane has 3 and Paul has 2
         assert( res, "Peter have 15 dollars, Jane has 3 and Paul has 2");
       });    
@@ -128,6 +147,7 @@ describe('string-mutator', function() {
         var msg = "Peter have 15 dollars"
         var res = sm.content(msg).appendTxt('Tina has 7').after(/Tina/).first(/\d/g).replaceWith('12');
 
+        console.log('appendTxt', res);
         // => Peter has 15 dollars, Tina has 12
         assert( res, "Peter have 15 dollars, Tina has 12");
       });    
@@ -138,6 +158,7 @@ describe('string-mutator', function() {
         var msg = "Peter have 15 dollars, Paul"
         var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7').first(/\d/g).replaceWith('12');
 
+        console.log('prependTxt', res);
         // => Peter have 12 dollars, Tina has 7, Paul
         assert( res, "Peter have 12 dollars, Tina has 7, Paul");
       });    

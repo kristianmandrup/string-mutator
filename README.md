@@ -226,6 +226,18 @@ Adds text at the end of content
 
 `sm.content("Paula").appendTxt(', says Goodbye')`
 
+### Bugs!!
+
+Currently, the following functions don't operate exactly as specified:
+
+- before
+- after
+- between
+- prependTxt
+- appendTxt
+
+A little more development is required... Please help out ;)
+
 ### More advanced operations
 
 For even more string manipulation, I recommend splitting a string into its multiple parts using a `split` function, then iterating through them and using this API on each part, then joining them back together.
