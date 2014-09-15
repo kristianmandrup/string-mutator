@@ -33,10 +33,10 @@ var fm = mutators.file; // file mutator
 var msg = "Peter has 8 dollars and Jane has 15"
 
 // String mutator
-sm.last(/\d+/g).remove('Jane has 15').on(msg);
+sm.last('Jane has 15').remove().on(msg);
 
 // using content
-sm.content(msg).last(/\d+/g).replace('15', '32');
+sm.content(msg).last(/\d+/g).replaceWith('32');
 
 
 // File mutator - performing string mutations
@@ -128,9 +128,9 @@ var res = sm.last(/\d+/g).append('$', msg);
 
 ```javascript
 var msg = "Peter has 8 dollars and Jane has 15$"
-var res = sm.last(/\d+/g).replace('15', '42', msg);
+var res = sm.last(/\d+/g).replaceWith('42', msg);
 
-res = sm.first(/\d+/g).replace('15', '42').on(msg);
+res = sm.first(/\d+/g).replaceWith('42').on(msg);
 
 // => "Peter has 8 dollars and Jane has 42");
 ```
@@ -139,11 +139,11 @@ res = sm.first(/\d+/g).replace('15', '42').on(msg);
 
 Replace match with empty content ;)
 
-var res = sm.last(/\d+/g).remove('15').on(msg);
+var res = sm.last(/\d+/g).remove().on(msg);
 
 ```javascript
 var msg = "Peter has 8 dollars and Jane has 15"
-var res = sm.last(/\d+/g).remove('and Jane has 15', msg);
+var res = sm.last('and Jane has 15').remove(msg);
 
 // => "Peter has 8 dollars");
 ```
@@ -154,7 +154,7 @@ You can also start by wrapping the text in a `content` object
 
 ```javascript
 var msg = "Peter has 8 dollars and Jane has 15"
-sm.content(msg).last(/\d+/g).remove('Jane has 15');
+sm.content(msg).last('Jane has 15').remove();
 
 // => "Peter has 8 dollars");
 ```
@@ -165,7 +165,7 @@ A `between` object takes a `content` object and returns a new `content` object w
 
 ```javascript
 var msg = "Peter has 15 dollars, Jane has 15 and Paul has 32 or 15"
-sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replace('20');
+sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 
 // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
 ```
