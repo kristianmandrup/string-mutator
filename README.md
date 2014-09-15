@@ -175,6 +175,8 @@ Content can be chained with any of the following:
 
 - first
 - last
+- before
+- after
 - between
 
 ```javascript
@@ -184,9 +186,24 @@ sm.content(msg).last('Jane has 15').remove();
 // => "Peter has 8 dollars");
 ```
 
+### Before
+
+`before` is chained on a `content` object and returns a new `content` object with the text before a match. Optionally it can take a matcher indicator string, which can be set to 'first' or 'last' (effectively: "before first" or "before last")
+
+```javascript
+var msg = "Peter has 15 dollars, Jane has 15 and Paul has 32"
+sm.content(msg).before(/Jane/).last(/\d+/g).replaceWith('20');
+
+// => Peter has 20 dollars, Jane has 15 and Paul has 32
+```
+
+### After
+
+Same as `before` but instead "after" ;)
+
 ### Between
 
-A `between` is chained on a `content` object and returns a new `content` object with the text between two matches.
+`between` is chained on a `content` object and returns a new `content` object with the text between two matches.
 
 ```javascript
 var msg = "Peter has 15 dollars, Jane has 15 and Paul has 32 or 15"

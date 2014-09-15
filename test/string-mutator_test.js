@@ -94,12 +94,32 @@ describe('string-mutator', function() {
     });
 
     describe('between', function() {
-      it('replace last 15 before Paul with 20', function() {
+      it('replace last 15 between Peter and Paul with 20', function() {
         var msg = "Paul and Peter have 15 dollars, Jane has 15 and Paul has 15"
         var res = sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 
         // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
         assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
+      });    
+    });
+
+    describe('before', function() {
+      it('replace last 15 before Paul with 20', function() {
+        var msg = "Peter have 15 dollars, Jane has 15 and Paul has 15"
+        var res = sm.content(msg).before(/Paul/).last(/\d+/g).replaceWith('20');
+
+        // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
+        assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
+      });    
+    });
+
+    describe('after', function() {
+      it('replace last 15 before Paul with 20', function() {
+        var msg = "Peter have 15 dollars, Jane has 1 and Paul has 2"
+        var res = sm.content(msg).after(/Jane/).first(/\d/g).replaceWith('3');
+
+        // => Peter has 15 dollars, Jane has 3 and Paul has 2
+        assert( res, "Peter have 15 dollars, Jane has 3 and Paul has 2");
       });    
     });
 
