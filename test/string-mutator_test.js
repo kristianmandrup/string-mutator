@@ -14,7 +14,7 @@ describe('string-mutator', function() {
         console.log('first prepend', res, ' -> Peter has $8 dollars and Jane has 15');
         // Peter has $8 dollars and Jane has 15
 
-        assert( res, "Peter has $8 dollars and Jane has 15");
+        assert.equal( res, "Peter has $8 dollars and Jane has 15");
       });    
     });
 
@@ -25,7 +25,7 @@ describe('string-mutator', function() {
 
         console.log('first prepend to', res, ' -> Peter has $8 dollars and Jane has 15');
         // Peter has $8 dollars and Jane has 15
-        assert( res, "Peter has $8 dollars and Jane has 15");
+        assert.equal( res, "Peter has $8 dollars and Jane has 15");
       });    
     });
 
@@ -36,7 +36,7 @@ describe('string-mutator', function() {
 
         console.log('first append', res, ' -> Peter has 8$ dollars and Jane has 15');
         // Peter has 8$ dollars and Jane has 15
-        assert( res, "Peter has 8$ dollars and Jane has 15");
+        assert.equal( res, "Peter has 8$ dollars and Jane has 15");
       });    
     });
   });
@@ -49,7 +49,7 @@ describe('string-mutator', function() {
 
         console.log('last prepend', res, ' -> Peter has 8 dollars and Jane has 15$');
         // Peter has 8 dollars and Jane has 15$
-        assert( res, "Peter has 8 dollars and Jane has $15");
+        assert.equal( res, "Peter has 8 dollars and Jane has $15");
       });    
     });
 
@@ -60,7 +60,7 @@ describe('string-mutator', function() {
         
         console.log('last append', res, ' -> Peter has 8 dollars and Jane has 15$');
         // Peter has 8 dollars and Jane has 15$
-        assert( res, "Peter has 8 dollars and Jane has 15$");
+        assert.equal( res, "Peter has 8 dollars and Jane has 15$");
       });    
     });
 
@@ -71,7 +71,7 @@ describe('string-mutator', function() {
 
         console.log('replace', res, '-> Peter has 8 dollars and Jane has 42');
         // Peter has 8 dollars and Jane has 42
-        assert( res, "Peter has 8 dollars and Jane has 42");
+        assert.equal( res, "Peter has 8 dollars and Jane has 42");
       });    
     });
 
@@ -82,7 +82,7 @@ describe('string-mutator', function() {
 
         console.log('replace.on', res);
         // Peter has 8 dollars and Jane has 42
-        assert( res, "Peter has 8 dollars and Jane has 42");
+        assert.equal( res, "Peter has 8 dollars and Jane has 42");
       });    
     });
 
@@ -93,7 +93,7 @@ describe('string-mutator', function() {
 
         console.log('remove', res);
         // Peter has 8 dollars and Julie has $
-        assert( res, "Peter has 8 dollars and Julie has $");
+        assert.equal( res, "Peter has 8 dollars and Julie has $");
       });    
     });
 
@@ -105,7 +105,7 @@ describe('string-mutator', function() {
         console.log('remove.on', res);
         // Peter has 8 dollars and Jane has $
 
-        assert( res, "Peter has 8 dollars and Jane has $");
+        assert.equal( res, "Peter has 8 dollars and Jane has $");
       });    
     });
   });
@@ -118,7 +118,7 @@ describe('string-mutator', function() {
 
         console.log('content.last remove', res);
 
-        assert( res, "Peter has 8 dollars and Jane has ");
+        assert.equal( res, "Peter has 8 dollars and Jane has ");
       });    
     });
 
@@ -129,7 +129,7 @@ describe('string-mutator', function() {
 
         console.log('between', res);
         // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
-        assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
+        assert.equal( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
       });    
     });
 
@@ -140,7 +140,7 @@ describe('string-mutator', function() {
 
         console.log('before', res);
         // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
-        assert( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
+        assert.equal( res, "Peter has 15 dollars, Jane has 20 and Paul has 32 or 15");
       });    
     });
 
@@ -151,7 +151,7 @@ describe('string-mutator', function() {
 
         console.log('after', res);
         // => Peter has 15 dollars, Jane has 3 and Paul has 2
-        assert( res, "Peter have 15 dollars, Jane has 3 and Paul has 2");
+        assert.equal( res, "Peter have 15 dollars, Jane has 3 and Paul has 2");
       });    
     });
 
@@ -162,7 +162,7 @@ describe('string-mutator', function() {
 
         console.log('appendTxt', res);
         // => Peter has 15 dollars, Tina has 12
-        assert( res, "Peter have 15 dollars, Tina has 12");
+        assert.equal( res, "Peter have 15 dollars, Tina has 12");
       });    
     });
 
@@ -173,7 +173,7 @@ describe('string-mutator', function() {
 
         console.log('prependTxt', res);
         // => Peter have 12 dollars, Tina has 7, Paul
-        assert( res, "Peter have 12 dollars, Tina has 7, Paul");
+        assert.equal( res, "Peter have 12 dollars, Tina has 7, Paul");
       });    
     });
 
