@@ -55,7 +55,7 @@ describe('string-mutator', function() {
 
     describe('append', function() {
       it('appends $ after 15', function() {
-        var msg = "Peter has 8 dollars and Jane has 15$"
+        var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.last(/\d+/g).append('$', msg);
         
         console.log('last append', res, ' -> Peter has 8 dollars and Jane has 15$');
@@ -66,7 +66,7 @@ describe('string-mutator', function() {
 
     describe('replace', function() {
       it('replace 15 with 42', function() {
-        var msg = "Peter has 8 dollars and Jane has 15$"
+        var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.last(/\d+/g).replaceWith('42', msg);
 
         console.log('replace', res, '-> Peter has 8 dollars and Jane has 42');
@@ -77,7 +77,7 @@ describe('string-mutator', function() {
 
     describe('replace.on', function() {
       it('replace 15 with 42', function() {
-        var msg = "Peter has 8 dollars and Jane has 15$"
+        var msg = "Peter has 8 dollars and Jane has 15"
         var res = sm.last(/\d+/g).replaceWith('42').on(msg);
 
         console.log('replace.on', res);
@@ -86,7 +86,7 @@ describe('string-mutator', function() {
       });    
     });
 
-    describe('remove', function() {
+    describe.only('remove', function() {
       it('remove 15', function() {
         var msg = "Peter has 8 dollars and Julie has 15$"
         var res = sm.last(/\d+/g).remove(msg);
