@@ -4,8 +4,8 @@
 var assert = require('assert');
 
 var mutators = require('../lib/mutators');
-var sm = mutators.sm;
-var fm = mutators.fm;
+var sm = mutators.string;
+var fm = mutators.file;
 
 describe('string-mutator', function() {
   describe('first', function() {  

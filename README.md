@@ -23,7 +23,24 @@ $ npm run-script browser
 
 ## Documentation
 
-See `/examples` folder ;)
+```javascript
+var mutators = require('../lib/mutators');
+var sm = mutators.string; // string mutator
+var fm = mutators.file; // file mutator
+
+var msg = "Peter has 8 dollars and Jane has 15"
+sm.content(msg).last(/\d+/g).remove('Jane has 15');
+
+// File mutator - performing string mutations
+fm.readFile('test/files/test.txt').perform(function() {
+    return this.first(/\d+/).prepend('$');
+  }).write();
+
+console.log('wrote', written, res.lastWritten);
+res.write(res.original);
+```
+
+## String mutator API
 
 ### first.prepend
 
@@ -81,7 +98,7 @@ var res = sm.last(/\d+/g).append('$', msg);
 // => "Peter has 8 dollars and Jane has 15$");
 ```
 
-### Replace
+### replace
 
 Can also be used with `first` or `last`
 
@@ -93,9 +110,9 @@ var res = sm.last(/\d+/g).replace('15', '42', msg);
 // => "Peter has 8 dollars and Jane has 42");
 ```
 
-### Remove
+### remove
 
-Replace with empty content...
+Replace match with empty content ;)
 
 var res = sm.last(/\d+/g).remove('15').on(msg);
 
@@ -119,7 +136,7 @@ sm.content(msg).last(/\d+/g).remove('Jane has 15');
 
 ### Between
 
-A `between` object takes a `content` object and returns a new content object with the text between two matches.
+A `between` object takes a `content` object and returns a new `content` object with the text between two matches.
 
 ```javascript
 var msg = "Peter has 15 dollars, Jane has 15 and Paul has 32 or 15"
@@ -133,18 +150,13 @@ sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replace('20');
 Note: `.perform` wraps the read content in a `content` object (see string-mutator above)
 
 ```javascript
-var wasRead = fm.readFile('test/files/test.txt')
-var res = wasRead.perform(function() {
-    var f = this.first(/\d+/).prepend('$');
-    console.log(f);
-    return f
+fm.readFile('test/files/test.txt').perform(function() {
+    return this.first(/\d+/).prepend('$');
   }).write();
 
-var written = res.read();
 console.log('wrote', written, res.lastWritten);
+res.write(res.original);
 
-console.log('rewrite original', wasRead.content);
-res.write(wasRead.content)
 res.writeFile('another_file.txt');
 ```
 
