@@ -7,6 +7,7 @@ var FileWriter = function(path, content) {
     read: function() {
       return String(fs.readFileSync(path));
     },
+    original: content.slice(0),
     lastWritten: null,
     write: function(newContent) {
       newContent = newContent || content
@@ -50,8 +51,8 @@ var File = {
 module.exports = File
 },{"./string-mutator":3,"fs":4}],2:[function(require,module,exports){
 module.exports = {
-  sm: require('./string-mutator'),
-  fm: require('./file-mutator')
+  string: require('./string-mutator'),
+  file: require('./file-mutator')
 }
 },{"./file-mutator":1,"./string-mutator":3}],3:[function(require,module,exports){
 /*
@@ -129,28 +130,29 @@ var createAction = function(action, expr, indexFun, content, ctx) {
   };
 }
 
-var replaceObj = function(expr, str, withStr, indexFun, ctx) {
-  var onFun = function (content) {
-    var idx = indexFun(expr, str);    
+var replaceObj = function(expr, withStr, indexFun, content, ctx) {
+  var onFun = function (txt) {
+    txt = txt || content
+    var idx = indexFun(expr, txt);    
     
     if (idx == null || idx.index < 0) {
         return null;
     }
 
-    var first = content.slice(0, idx.index);
-    var rest = content.slice(idx.index + idx.matched.length);
+    var first = txt.slice(0, idx.index);
+    var rest = txt.slice(idx.index + idx.matched.length);
     return first.concat(withStr).concat(rest);
   }
   return ctx ? onFun : {on: onFun}
 }
 
 var createReplaceAction = function(action, expr, indexFun, content, removeStr, ctx) {
-  return function (str, withStr, text, options) {
+  return function (withStr, text, options) {
     options = options || {}
     text    = text || content;
     withStr = removeStr ? removeStr : withStr;
 
-    var obj = action(expr, str, withStr, indexFun, ctx);
+    var obj = action(expr, withStr, indexFun, content, ctx);
     if (ctx) return obj(text);
     return text ? obj.on(text) : obj;
   };
@@ -165,7 +167,7 @@ var actors = {
 
 var createObj = function(expr, indexFun, content, ctx) {  
   return {
-    replace: createReplaceAction(actors.replacer, expr, indexFun, content, null, ctx),
+    replaceWith: createReplaceAction(actors.replacer, expr, indexFun, content, null, ctx),
 
     remove: createReplaceAction(actors.replacer, expr, indexFun, content, '', ctx),
 
@@ -191,11 +193,68 @@ var content = function(txt) {
     last: function(expr) {
       return createObj(expr, lastIndex, txt, true);        
     },
-    between: function(startExpr) {
-      var startIndex = txt.match(startExpr);
+    before: function(startExpr, matcher) {
+      var startMatches = txt.match(startExpr);
+      var matchIndex = 0; // first
+      if (startMatches.length > 0) {
+        if (matcher == 'last') 
+          matchIndex = startMatches.length -1; // last
+      }
+        
+      var startMatch = startMatches[matchIndex];
+
+      if (!startMatch) {
+        throw new Error("No match for " + String(startExpr) + " in " + txt);
+      }
+      var startIndex = txt.indexOf(startMatch);
+      var newTxtScope = txt.slice(0).slice(startIndex);
+      return content(newTxtScope);
+    },
+    after: function(endExpr, matcher) {
+      var endMatches = txt.match(endExpr);
+
+      var matchIndex = 0; // first
+      if (endMatches.length > 0) {
+        if (matcher == 'last') 
+          matchIndex = startMatches.length -1; // last        
+      }
+      var endMatch = endMatches[matchIndex];
+
+      if (!endMatch) {
+        throw new Error("No match for " + String(endExpr) + " in " + txt);
+      }
+      var endIndex = txt.indexOf(endMatch);
+      var newTxtScope = txt.slice(0).slice(endIndex);
+      return content(newTxtScope);
+    },    
+    between: function(startExpr, options) {
+      options = options || {}
+      var startMatches = txt.match(startExpr);
+      var startMatch;
+      if (startMatches.length > 0)
+        startMatch = startMatches[0];
+
+      var startIndex = 0;
+      if (!startMatch && !options.force) {
+        throw new Error("No match for " + String(startExpr) + " in " + txt);
+      }
+      var startIndex = txt.indexOf(startMatch);
+
       return {
         and: function(endExpr) {
-          var endIndex = txt.match(endExpr);
+          var rest = txt.slice(0).slice(startIndex);
+          // ensure we are only matching after last match!
+          var endMatches = rest.match(endExpr);
+          var endMatch;
+          if (endMatches.length > 0)
+            endMatch = endMatches[0];
+
+          if (!endMatch && !options.force) {
+            throw new Error("No match for " + String(endExpr) + " in " + txt);
+          }
+          var endIndexRest = rest.indexOf(endMatch);
+          var endIndex = startIndex + endIndexRest;
+
           var newTxtScope = txt.slice(0).slice(startIndex, endIndex);
           return content(newTxtScope);
         }
