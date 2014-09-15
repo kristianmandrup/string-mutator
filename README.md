@@ -212,6 +212,12 @@ sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
 ```
 
+### More advanced operations
+
+For even more string manipulation, I recommend splitting a string into its multiple parts using a `split` function, then iterating through them and using this API on each part, then joining them back together.
+
+You are most welcome to propose a nice API to facilitate this.
+
 ## File mutator API
 
 File mutation always starts with `readFile`
@@ -252,6 +258,8 @@ res.writeFile('another_file.txt');
 ## TODO
 
 Cleanup and Refactor...
+
+Add more customizability than simply first/last. It would be sweet if user could pass a function that selects one or more matches to operate on/from.
 
 ## Contributing
 
