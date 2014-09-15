@@ -37,6 +37,8 @@
   },
   "scripts": {
     "test": "grunt",
-    "browser": "browserify lib/mutators.js > mutators.js" 
+    "browser": "browserify lib/mutators.js > mutators.js",
+    "publish-bower": "bower register string-mutator git://github.com/kristianmandrup/string-mutator.git",
+    "publish-npm": "npm publish"
   } 
 }
