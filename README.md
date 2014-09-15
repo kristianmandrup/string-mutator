@@ -178,6 +178,8 @@ Content can be chained with any of the following:
 - before
 - after
 - between
+- prependTxt
+- appendTxt
 
 ```javascript
 var msg = "Peter has 8 dollars and Jane has 15"
@@ -211,6 +213,18 @@ sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 
 // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
 ```
+
+### prependTxt
+
+Adds text at beginning of content
+
+`sm.content("Kristian").prependTxt('Hello, Sir ')``
+
+### appendTxt
+
+Adds text at the end of content
+
+`sm.content("Paula").appendTxt(', says Goodbye')`
 
 ### More advanced operations
 

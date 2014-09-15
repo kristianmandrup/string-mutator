@@ -123,5 +123,25 @@ describe('string-mutator', function() {
       });    
     });
 
+    describe('appendTxt', function() {
+      it('append with: Tina has 7', function() {
+        var msg = "Peter have 15 dollars"
+        var res = sm.content(msg).appendTxt('Tina has 7').after(/Tina/).first(/\d/g).replaceWith('12');
+
+        // => Peter has 15 dollars, Tina has 12
+        assert( res, "Peter have 15 dollars, Tina has 12");
+      });    
+    });
+
+    describe('prependTxt', function() {
+      it('prepend with: Tina has 10', function() {
+        var msg = "Peter have 15 dollars, Paul"
+        var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7').first(/\d/g).replaceWith('12');
+
+        // => Peter have 12 dollars, Tina has 7, Paul
+        assert( res, "Peter have 12 dollars, Tina has 7, Paul");
+      });    
+    });
+
   });
 });
