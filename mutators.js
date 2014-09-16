@@ -40,7 +40,7 @@ var File = {
     var ctx = sm.content(fileTxt);
     return {
       perform: function(performer) {
-        var res = performer.call(ctx);
+        var res = performer.call(ctx).result;
         return FileWriter(path, res);
       },
       content: fileTxt,
@@ -65,6 +65,25 @@ module.exports = {
 
 'use strict';
 
+var regexIndexOf = function(string, pattern, startIndex )
+{
+    startIndex = startIndex || 0;
+    var searchResult = string.substr( startIndex ).search( pattern );
+    return ( -1 === searchResult ) ? -1 : searchResult + startIndex;
+}
+
+var regexLastIndexOf = function(string, pattern, startIndex )
+{
+    startIndex = startIndex === undefined ? string.length : startIndex;
+    var searchResult = string.substr( 0, startIndex ).reverse().regexIndexOf( pattern, 0 );
+    return ( -1 === searchResult ) ? -1 : string.length - ++searchResult;
+}
+
+var reverse = function(string)
+{
+    return string.split('').reverse().join('');
+}
+
 var firstIndex = function(expr, str) {
   var matches = str.match(expr);
   if (matches.length == 0) return null;
@@ -77,86 +96,124 @@ var lastIndex = function(expr, str) {
   var matches = str.match(expr);
   if (matches.length == 0) return null;
   var matched = matches[matches.length -1];
-  var index = str.indexOf(matched);
+  var index = str.lastIndexOf(matched);
   return {index: index, matched: matched};  
 }
 
 // append/prepend
-var appendObj = function(expr, str, indexFun, ctx) {
+var appendObj = function(expr, str, indexFun, ctx, contentCtx) {
   var toFun = function (content) {
     var idx = indexFun(expr, content);    
-
+    var result;
     if (idx == null || idx.index < 0) {
       if (options.force)
-        return content.concat(str);
+        result = content.concat(str);
       else
-        return null;
+        result = content;
     }
 
     var first = content.slice(0, idx.index);
     var rest = content.slice(idx.index + idx.matched.length);
-    return first.concat(idx.matched).concat(str).concat(rest);      
+    result = first.concat(idx.matched).concat(str).concat(rest);      
+
+    if (contentCtx) {
+      return {
+        mergeRest: mergeRest(contentCtx),
+        result: result
+      }
+    }
+    return result;
   }
 
   return ctx ? toFun : {to: toFun}
 }
 
 // TODO: should take function as last arg
-var prependObj = function(expr, str, indexFun, ctx) {
+var prependObj = function(expr, str, indexFun, ctx, contentCtx) {
   var toFun = function (content) {
     var idx = indexFun(expr, content);
+    var result;
     if (idx == null || idx.index < 0) {
       if (options.force)
-        return str.concat(content);
+        result = str.concat(content);
       else
-        return null;
+        result = content;
+    } else {
+      var first = content.slice(0, idx.index);
+      var rest = content.slice(idx.index);
+      result = first.concat(str).concat(rest);      
     }
 
-    var first = content.slice(0, idx.index);
-    var rest = content.slice(idx.index);
-    return first.concat(str).concat(rest);
+    if (contentCtx) {
+      return {
+        mergeRest: mergeRest(contentCtx),
+        result: result
+      }
+    } 
+    return result;
   };
   return ctx ? toFun : {to: toFun}
 }
 
-var createAction = function(action, expr, indexFun, content, ctx) {
+var createAction = function(action, expr, indexFun, content, ctx, contentCtx) {
   return function (str, text, options) {
     options = options || {}
     text    = text || content;
 
-    var obj = action(expr, str, indexFun, ctx);
+    var obj = action(expr, str, indexFun, ctx, contentCtx);
     if (ctx) return obj(text);
     return text ? obj.to(text) : obj;
   };
 }
 
-var replaceObj = function(expr, withStr, indexFun, content, ctx) {
+var replaceObj = function(expr, withStr, indexFun, content, ctx, contentCtx) {
   var onFun = function (txt) {
     txt = txt || content
     var idx = indexFun(expr, txt);    
-    
+    var result;    
     if (idx == null || idx.index < 0) {
-        return null;
+        result = content;
+    } else {
+      var first = txt.slice(0, idx.index);
+      var rest = txt.slice(idx.index + idx.matched.length);
+      result = first.concat(withStr).concat(rest);      
     }
 
-    var first = txt.slice(0, idx.index);
-    var rest = txt.slice(idx.index + idx.matched.length);
-    return first.concat(withStr).concat(rest);
+    if (contentCtx) {
+      return {
+        mergeRest: mergeRest(contentCtx),
+        result: result
+      }
+    }
+    return result;
   }
   return ctx ? onFun : {on: onFun}
 }
 
-var createReplaceAction = function(action, expr, indexFun, content, removeStr, ctx) {
+var createReplaceAction = function(action, expr, indexFun, content, removeStr, ctx, contentCtx) {
   return function (withStr, text, options) {
     options = options || {}
     text    = text || content;
     withStr = removeStr ? removeStr : withStr;
 
-    var obj = action(expr, withStr, indexFun, content, ctx);
+    var obj = action(expr, withStr, indexFun, content, ctx, contentCtx);
+
     if (ctx) return obj(text);
     return text ? obj.on(text) : obj;
   };
 }
+
+var createRemoveAction = function(action, expr, indexFun, content, removeStr, ctx, contentCtx) {
+  return function (text, withStr) {
+    text    = text || content;
+    withStr = withStr || removeStr;
+
+    var obj = action(expr, withStr, indexFun, content, ctx, contentCtx);
+    if (ctx) return obj(text);
+    return text ? obj.on(text) : obj;
+  };
+}
+
 
 var actors = {
   replacer: replaceObj,
@@ -165,17 +222,31 @@ var actors = {
 };    
 
 
-var createObj = function(expr, indexFun, content, ctx) {  
-  return {
-    replaceWith: createReplaceAction(actors.replacer, expr, indexFun, content, null, ctx),
+var mergeRest = function (contentCtx) {
+  return function() {
+    var res = this.result;
+    // console.log('contentCtx', contentCtx);
+    if (contentCtx.remainderAfter)
+      res = res.concat(contentCtx.remainderAfter);
 
-    remove: createReplaceAction(actors.replacer, expr, indexFun, content, '', ctx),
-
-    prepend: createAction(actors.prepender, expr, indexFun, content, ctx),
-    append: createAction(actors.appender, expr, indexFun, content, ctx)
-  };
+    if (contentCtx.remainderBefore)
+      res = contentCtx.remainderBefore.concat(res);
+    this.result = res
+    return res;
+  }
 };
 
+
+var createObj = function(expr, indexFun, content, ctx, contentCtx) {  
+  return {
+    replaceWith: createReplaceAction(actors.replacer, expr, indexFun, content, null, ctx, contentCtx),
+
+    remove:  createRemoveAction(actors.replacer, expr, indexFun, content, '', ctx, contentCtx),
+
+    prepend: createAction(actors.prepender, expr, indexFun, content, ctx, contentCtx),
+    append:  createAction(actors.appender, expr, indexFun, content, ctx, contentCtx)
+  };
+};
 
 var first = function (expr) {
   return createObj(expr, firstIndex);
@@ -185,19 +256,53 @@ var last = function (expr) {
   return createObj(expr, lastIndex);
 };
 
-var content = function(txt) {
-  return {
+var content = function(txt, ctx) {
+  var contentObj = {
+    text: txt,
     first: function(expr) {
-      return createObj(expr, firstIndex, txt, true);        
+      return createObj(expr, firstIndex, txt, true, ctx || this);        
     },
     last: function(expr) {
-      return createObj(expr, lastIndex, txt, true);        
+      return createObj(expr, lastIndex, txt, true, ctx || this);        
     },
-    before: function(startExpr, matcher) {
+    appendTxt: function(apTxt) {
+      // TODO: first(this.lastMatch).append(preTxt) ?
+      var copy = txt.slice(0);
+      switch (this.lastOp) {
+        case 'before':
+        case 'after':
+          var index = regexIndexOf(txt, this.lastMatch);
+          txt = copy.substring(0, index + this.lastMatch.length).concat(apTxt).concat(copy.substring(index + this.lastMatch.length));
+          break;
+        default:
+          txt = txt.concat(apTxt);
+      }
+      this.text = txt;
+      return this;
+    },
+    prependTxt: function(preTxt) {
+      var copy = txt.slice(0);
+      switch (this.lastOp) {
+        case 'before':
+          // TODO: first(this.lastMatch).prepend(preTxt) ?
+          var matchTxt = txt + this.lastMatchTxt;          
+          var index = regexIndexOf(matchTxt, this.lastMatch);
+          txt = copy.substring(0, index).concat(preTxt).concat(copy.substring(index));
+          break;
+        case 'after':
+          break;
+        default:
+          txt = preTxt.concat(txt);
+      }
+      this.text = txt;
+      return this;      
+    },
+    before: function(startExpr, options) {
+      options = options || {}
       var startMatches = txt.match(startExpr);
       var matchIndex = 0; // first
       if (startMatches.length > 0) {
-        if (matcher == 'last') 
+        if (options.match == 'last') 
           matchIndex = startMatches.length -1; // last
       }
         
@@ -207,15 +312,23 @@ var content = function(txt) {
         throw new Error("No match for " + String(startExpr) + " in " + txt);
       }
       var startIndex = txt.indexOf(startMatch);
-      var newTxtScope = txt.slice(0).slice(startIndex);
-      return content(newTxtScope);
+      var txtCopy = txt.slice(0);
+      var cutIndex = options.include ? startIndex + startMatch.length : startIndex;
+      var newTxtScope = txtCopy.slice(0, cutIndex);
+      this.remainderAfter = txtCopy.slice(cutIndex);
+      this.remainderBefore = null;
+      this.lastOp = 'before';
+      this.lastMatch = startExpr;      
+      this.lastMatchTxt = startMatch;
+      return content(newTxtScope, this);
     },
-    after: function(endExpr, matcher) {
+    after: function(endExpr, options) {
+      options = options || {}
       var endMatches = txt.match(endExpr);
 
       var matchIndex = 0; // first
       if (endMatches.length > 0) {
-        if (matcher == 'last') 
+        if (options.match == 'last') 
           matchIndex = startMatches.length -1; // last        
       }
       var endMatch = endMatches[matchIndex];
@@ -224,9 +337,19 @@ var content = function(txt) {
         throw new Error("No match for " + String(endExpr) + " in " + txt);
       }
       var endIndex = txt.indexOf(endMatch);
-      var newTxtScope = txt.slice(0).slice(endIndex);
-      return content(newTxtScope);
-    },    
+      var txtCopy = txt.slice(0);
+      var cutIndex = options.include ? endIndex : endIndex + endMatch.length;
+
+      var newTxtScope = txtCopy.slice(cutIndex);
+
+      this.remainderBefore = txtCopy.slice(0, cutIndex);      
+      this.remainderAfter = null;
+      this.lastOp = 'after';
+      this.lastMatch = endExpr;
+      this.lastMatchTxt = endMatch;      
+      return content(newTxtScope, this);
+    }, 
+    // TODO: Same as after(startExpr).before(endExpr)
     between: function(startExpr, options) {
       options = options || {}
       var startMatches = txt.match(startExpr);
@@ -239,9 +362,12 @@ var content = function(txt) {
         throw new Error("No match for " + String(startExpr) + " in " + txt);
       }
       var startIndex = txt.indexOf(startMatch);
+      if (options.include)
+          startIndex = startIndex + startMatch.length
 
       return {
-        and: function(endExpr) {
+        and: function(endExpr, options) {
+          options = options || {}
           var rest = txt.slice(0).slice(startIndex);
           // ensure we are only matching after last match!
           var endMatches = rest.match(endExpr);
@@ -253,14 +379,55 @@ var content = function(txt) {
             throw new Error("No match for " + String(endExpr) + " in " + txt);
           }
           var endIndexRest = rest.indexOf(endMatch);
-          var endIndex = startIndex + endIndexRest;
+          if (options.include)
+              endIndexRest = endIndexRest + endMatch.length
 
-          var newTxtScope = txt.slice(0).slice(startIndex, endIndex);
-          return content(newTxtScope);
-        }
+          var endIndex = startIndex + endIndexRest;
+          var txtCopy = txt.slice(0);
+          var newTxtScope = txtCopy.slice(startIndex, endIndex);
+          this.remainderBefore = txtCopy.slice(0, startIndex);      
+          this.remainderAfter = txtCopy.slice(endIndex);
+          this.lastOp = 'between';
+          this.lastMatch = endExpr;          
+          return content(newTxtScope, this);
+        },
+        andIncl: function(expr, options) {
+          options = options || {}
+          otions.include = true;
+          this.and(expr, options);
+        }           
       }
+    },
+    afterIncl: function(expr, options) {
+      options = options || {}
+      otions.include = true;
+      this.after(expr, options);
+    },
+    beforeIncl: function(expr, options) {
+      options = options || {}
+      otions.include = true;
+      this.before(expr, options);
+    },
+    betweenIncl: function(expr, options) {
+      options = options || {}
+      otions.include = true;
+      this.between(expr, options);
+    },
+    afterLast: function(expr, options) {
+      options = options || {}
+      otions.match = 'last';
+      this.after(expr, options);
+    },
+    beforeLast: function(expr, options) {
+      options = options || {}
+      otions.last = true;
+      this.before(expr, options);
     }
   };
+  contentObj.lastOp = ctx ? ctx.lastOp : null;
+  contentObj.lastMatch = ctx ? ctx.lastMatch : null;
+  contentObj.lastMatchTxt = ctx ? ctx.lastMatchTxt : null;
+  return contentObj;  
 };
 
 module.exports = {
