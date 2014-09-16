@@ -7,10 +7,10 @@ var fm     = require('../lib/file-mutator.js');
 describe('file-mutator', function() {
   describe('readFile', function() {  
     describe('.content', function() {  
-      it('prepends $ before 8', function() {
+      it('reads content from file', function() {
         var res = fm.readFile('test/files/test.txt').content;
 
-        assert( res, "Peter has $8 dollars and Jane has 15");
+        assert.equal( res, "Peter has 8 dollars and Jane has 15");
       });        
     });    
 
@@ -25,7 +25,7 @@ describe('file-mutator', function() {
         // console.log('wrote', written);
         // console.log('rewrite original', wasRead.content);
         res.write(wasRead.content)
-        assert( written, "Peter has $8 dollars and Jane has 15");
+        assert.equal( written, "Peter has $8 dollars and Jane has 15");
       });        
     });    
   });    

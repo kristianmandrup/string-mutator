@@ -199,9 +199,42 @@ sm.content(msg).before(/Jane/).last(/\d+/g).replaceWith('20');
 // => Peter has 20 dollars, Jane has 15 and Paul has 32
 ```
 
+chaining `prependTxt` on `before` prepends the text before the match.
+
+```javascript
+msg = "Peter have 12 dollars, Paul"
+var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7.').text;
+// => Peter have 12 dollars, Tina has 7
+```
+
+Using `mergeRest()``
+
+```javascript
+msg = "Peter have 12 dollars, Paul"
+var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7 and').mergeRest();
+// => Peter have 12 dollars, Tina has 7 and Paul
+```
+
+*before last*
+
+`before` (and `after`) also take an options hash for further control.
+The `match: 'last'` option can be used to find the last match within the scope.
+
+```javascript
+msg = "Peter have 12 dollars, Paul is here Paul goes back"
+var res = sm.content(msg).before(/Paul/, {include: true, match: 'last'}).prependTxt('Tina has 7 and').mergeRest();
+// => Peter have 12 dollars, Paul is here Tina has 7 and Paul goes back
+```
+
+For convenience `beforeLast` and `afterLast` methods are also available.
+
+`var res = sm.content(msg).beforeLast(/Paul/)``
+
 ### After
 
 Same as `before` but instead "after" ;)
+
+If in doubt, see the test suite in the `/test` folder.
 
 ### Between
 
@@ -213,6 +246,23 @@ sm.content(msg).between(/Peter/).and(/Paul/).last(/\d+/g).replaceWith('20');
 
 // => Peter has 15 dollars, Jane has 20 and Paul has 32 or 15
 ```
+
+*inclusive*
+
+Both `between`, `and` are exclusive by default.
+You can now also use an options hash `{include: true}` to be inclusive.
+This option can also be used with `before` and `after`.
+
+```javascript
+var msg = "Peter has 15 dollars, Jane has 15 and Paul has 32 or 15"
+sm.content(msg).between(/Peter/, {include: true}).and(/Paul/, {include: true}).result;
+
+// => Peter has 15 dollars, Jane has 20 and Paul
+```
+
+Shorthand inclusive:
+
+`sm.content(msg).betweenIncl(/Peter/).andIncl(/Paul/)``
 
 ### prependTxt
 
@@ -226,17 +276,9 @@ Adds text at the end of content
 
 `sm.content("Paula").appendTxt(', says Goodbye')`
 
-### Bugs!!
+### Status
 
-Currently, the following functions don't operate exactly as specified:
-
-- before
-- after
-- between
-- prependTxt
-- appendTxt
-
-A little more development is required... Please help out ;)
+All tests pass :)
 
 ### More advanced operations
 
@@ -283,7 +325,7 @@ res.writeFile('another_file.txt');
 
 ## TODO
 
-Cleanup and Refactor...
+Cleanup and Refactor!!! Lot's of duplication :(
 
 Add more customizability than simply first/last. It would be sweet if user could pass a function that selects one or more matches to operate on/from.
 
