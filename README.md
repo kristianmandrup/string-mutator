@@ -203,7 +203,7 @@ chaining `prependTxt` on `before` prepends the text before the match.
 
 ```javascript
 msg = "Peter have 12 dollars, Paul"
-var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7.').text;
+var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7.').result;
 // => Peter have 12 dollars, Tina has 7
 ```
 

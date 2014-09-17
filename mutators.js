@@ -1,16 +1,38 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+},{}],2:[function(require,module,exports){
 fs = require('fs');
 sm = require('./string-mutator');
 
+var DummyFileWriter = function(path, txt) {
+  return {
+    read: function() {
+      return null;
+    },
+    original: txt,
+    lastWritten: null,
+    write: function(newContent) {
+      return null;
+    },
+
+    // write mutated output to another file
+    writeFile: function(newPath, newContent) {
+      return null;
+    }    
+  }
+};
+
 var FileWriter = function(path, content) {
+  // TODO: if no content throw Error?
+  var inputTxt = content ? content.slice(0) : '';
   return {
     read: function() {
       return String(fs.readFileSync(path));
     },
-    original: content.slice(0),
+    original: inputTxt,
     lastWritten: null,
     write: function(newContent) {
-      newContent = newContent || content
+      newContent = newContent || inputTxt
       // write to same file that was read in readFile
       this.writeFile(path, newContent)
 
@@ -19,7 +41,7 @@ var FileWriter = function(path, content) {
 
     // write mutated output to another file
     writeFile: function(newPath, newContent) {
-      newContent = newContent || content
+      newContent = newContent || inputTxt
       
       try {
         fs.writeFileSync(newPath, newContent);
@@ -40,8 +62,17 @@ var File = {
     var ctx = sm.content(fileTxt);
     return {
       perform: function(performer) {
-        var res = performer.call(ctx).result;
-        return FileWriter(path, res);
+        var performed = performer.call(ctx);
+
+        if (typeof performed === 'undefined')
+          throw new Error("No result from perform, I think you forgot to return the value!");
+
+        var res = performed ? performed.result : null;
+        if (res)
+          return FileWriter(path, res);
+        else {
+          return DummyFileWriter(path, fileTxt);
+        }          
       },
       content: fileTxt,
     }    
@@ -49,12 +80,12 @@ var File = {
 }
 
 module.exports = File
-},{"./string-mutator":3,"fs":4}],2:[function(require,module,exports){
+},{"./string-mutator":4,"fs":1}],3:[function(require,module,exports){
 module.exports = {
   string: require('./string-mutator'),
   file: require('./file-mutator')
 }
-},{"./file-mutator":1,"./string-mutator":3}],3:[function(require,module,exports){
+},{"./file-mutator":2,"./string-mutator":4}],4:[function(require,module,exports){
 /*
  * 
  * https://github.com/kristianmandrup/string-mutator
@@ -86,7 +117,9 @@ var reverse = function(string)
 
 var firstIndex = function(expr, str) {
   var matches = str.match(expr);
-  if (matches.length == 0) return null;
+  if (!matches || matches.length == 0) {
+    return null;
+  }
   var matched = matches[0];
   var index = str.indexOf(matched);
   return {index: index, matched: matched};  
@@ -94,7 +127,7 @@ var firstIndex = function(expr, str) {
 
 var lastIndex = function(expr, str) {
   var matches = str.match(expr);
-  if (matches.length == 0) return null;
+  if (!matches || matches.length == 0) return null;
   var matched = matches[matches.length -1];
   var index = str.lastIndexOf(matched);
   return {index: index, matched: matched};  
@@ -190,7 +223,7 @@ var replaceObj = function(expr, withStr, indexFun, content, ctx, contentCtx) {
   return ctx ? onFun : {on: onFun}
 }
 
-var createReplaceAction = function(action, expr, indexFun, content, removeStr, ctx, contentCtx) {
+var createReplaceAction = function(action, expr, indexFun, content, removeStr, ctx, contentCtx) {  
   return function (withStr, text, options) {
     options = options || {}
     text    = text || content;
@@ -244,7 +277,7 @@ var createObj = function(expr, indexFun, content, ctx, contentCtx) {
     remove:  createRemoveAction(actors.replacer, expr, indexFun, content, '', ctx, contentCtx),
 
     prepend: createAction(actors.prepender, expr, indexFun, content, ctx, contentCtx),
-    append:  createAction(actors.appender, expr, indexFun, content, ctx, contentCtx)
+    append:  createAction(actors.appender, expr, indexFun, content, ctx, contentCtx),
   };
 };
 
@@ -258,7 +291,7 @@ var last = function (expr) {
 
 var content = function(txt, ctx) {
   var contentObj = {
-    text: txt,
+    result: txt,
     first: function(expr) {
       return createObj(expr, firstIndex, txt, true, ctx || this);        
     },
@@ -277,7 +310,7 @@ var content = function(txt, ctx) {
         default:
           txt = txt.concat(apTxt);
       }
-      this.text = txt;
+      this.result = txt;
       return this;
     },
     prependTxt: function(preTxt) {
@@ -294,14 +327,14 @@ var content = function(txt, ctx) {
         default:
           txt = preTxt.concat(txt);
       }
-      this.text = txt;
+      this.result = txt;
       return this;      
     },
     before: function(startExpr, options) {
       options = options || {}
       var startMatches = txt.match(startExpr);
       var matchIndex = 0; // first
-      if (startMatches.length > 0) {
+      if (startMatches && startMatches.length > 0) {
         if (options.match == 'last') 
           matchIndex = startMatches.length -1; // last
       }
@@ -327,7 +360,7 @@ var content = function(txt, ctx) {
       var endMatches = txt.match(endExpr);
 
       var matchIndex = 0; // first
-      if (endMatches.length > 0) {
+      if (endMatches && endMatches.length > 0) {
         if (options.match == 'last') 
           matchIndex = startMatches.length -1; // last        
       }
@@ -354,7 +387,7 @@ var content = function(txt, ctx) {
       options = options || {}
       var startMatches = txt.match(startExpr);
       var startMatch;
-      if (startMatches.length > 0)
+      if (startMatches && startMatches.length > 0)
         startMatch = startMatches[0];
 
       var startIndex = 0;
@@ -372,7 +405,7 @@ var content = function(txt, ctx) {
           // ensure we are only matching after last match!
           var endMatches = rest.match(endExpr);
           var endMatch;
-          if (endMatches.length > 0)
+          if (endMatches && endMatches.length > 0)
             endMatch = endMatches[0];
 
           if (!endMatch && !options.force) {
@@ -427,6 +460,7 @@ var content = function(txt, ctx) {
   contentObj.lastOp = ctx ? ctx.lastOp : null;
   contentObj.lastMatch = ctx ? ctx.lastMatch : null;
   contentObj.lastMatchTxt = ctx ? ctx.lastMatchTxt : null;
+  contentObj.mergeRest = mergeRest(ctx || this);
   return contentObj;  
 };
 
@@ -437,6 +471,4 @@ module.exports = {
   last: last
 }
 
-},{}],4:[function(require,module,exports){
-
-},{}]},{},[2])
+},{}]},{},[3]);

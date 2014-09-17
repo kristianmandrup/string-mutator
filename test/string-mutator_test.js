@@ -149,7 +149,7 @@ describe('string-mutator', function() {
     describe('before', function() {
       it('sets new scope before match', function() {
         var msg = "Jane has 15 and Paul has 15"
-        var res = sm.content(msg).before(/Paul/).text;
+        var res = sm.content(msg).before(/Paul/).result;
 
         // console.log('before', res, "-> Jane has 15 and ");
         // => Jane has 15
@@ -179,7 +179,7 @@ describe('string-mutator', function() {
     describe('after', function() {
       it('sets new scope after match', function() {
         var msg = "Jane has 15 and Paul has 15"
-        var res = sm.content(msg).after(/15/).text;
+        var res = sm.content(msg).after(/15/).result;
 
         // console.log('before', res, "-> and Paul has 15");
         // => and Paul has 15
@@ -209,7 +209,7 @@ describe('string-mutator', function() {
       it('append with: Tina has 7', function() {
         var msg = "Peter have 15 dollars"
         var res = sm.content(msg).appendTxt(', Tina has 7')
-        var txt = res.text;
+        var txt = res.result;
 
         // console.log('appendTxt', txt);
         // => Peter has 15 dollars, Tina has 7
@@ -239,7 +239,7 @@ describe('string-mutator', function() {
     describe('prependTxt', function() {
       it('prepend with: Tina has 10', function() {
         var msg = "Peter have 12 dollars, Paul"
-        var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7, ').text;
+        var res = sm.content(msg).before(/Paul/).prependTxt('Tina has 7, ').result;
 
         // console.log('prependTxt', res, "-> Peter have 12 dollars, Tina has 7, Paul");
         // => Peter have 12 dollars, Tina has 7, Paul

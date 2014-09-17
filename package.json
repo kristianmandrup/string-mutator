@@ -1,6 +1,6 @@
 {
   "name": "string-mutator",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "main": "lib/mutators.js",
   "description": "Perform mutation operations on text strings (or text files). Useful for (simple) automatic code refactorings f.ex in code generators",
   "homepage": "https://github.com/kristianmandrup/string-mutator",  
