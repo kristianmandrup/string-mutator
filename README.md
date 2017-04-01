@@ -1,5 +1,7 @@
 #  [![Build Status](https://secure.travis-ci.org/kristianmandrup/string-mutator.png?branch=master)](http://travis-ci.org/kristianmandrup/string-mutator)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kristianmandrup/string-mutator.svg)](https://greenkeeper.io/)
+
 Perform mutation operations on text strings (or text files). 
 Useful for (simple) automatic code refactorings f.ex in code generators.
 
